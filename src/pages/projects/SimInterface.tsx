@@ -1,5 +1,3 @@
-import './SimInterface.css';
-
 import React from "react";
 
 import {doc, getDoc} from "firebase/firestore";
@@ -115,7 +113,7 @@ export default class SimInterface extends React.Component<{}, RequestIO & Simula
     return(
       <main>
         <h1 className="mb-4">{this.state.title}</h1>
-        <div className="description">
+        <div className="mb-3">
           <p className="long-desc">{this.state.long_desc}</p>
           <p>{this.state.tags}</p>
           {(this.state.cout_size) && // Render only if cout_size is defined
@@ -130,7 +128,9 @@ export default class SimInterface extends React.Component<{}, RequestIO & Simula
               protect the server from excessive and/or unintended payloads.
             </p>
           }
-          <NavButton href="/projects">Back to projects</NavButton>
+          <NavButton className="me-2" href="/projects">
+            Back to projects
+          </NavButton>
           {(this.state.repo) && // Render only if repo is defined
             <Button onClick={() => window.open(this.state.repo)}>
               View repository on GitHub
@@ -139,9 +139,11 @@ export default class SimInterface extends React.Component<{}, RequestIO & Simula
         </div>
         {(this.state.cout_size) && // Render only if cout_size is defined
           // (All sims define it, so if undefined, the database read failed)
-          <div className="backend-container">
-            <p className="bg-dark">C++ Back-end Interface</p>
-            <Form>
+          <div className="border border-dark rounded-3">
+            <p className="bg-dark px-3 py-2 rounded-top text-white">
+              C++ Back-end Interface
+            </p>
+            <Form className="px-3">
               <Form.Group className="mb-3" controlId="cpp-input">
                 <Form.Label>Input</Form.Label>
                 <Form.Control

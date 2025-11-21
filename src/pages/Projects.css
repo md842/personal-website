@@ -6,7 +6,7 @@
     display: none;
   }
 
-  .form-control{ /* Add some space between search bar and projects. */
+  .search-bar{ /* Add some space between search bar and projects. */
     margin-bottom: 2em !important; /* Overriden by mb-3 without !important */
   }
 }

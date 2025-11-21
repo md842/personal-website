@@ -52,10 +52,14 @@ export function ProjectCard(params: Project): JSX.Element{
       <Card.Text>{params.card_desc}</Card.Text>
       <Card.Text>Tags: {unraveledTags}</Card.Text>
       {params.sim && // Return NavButton element if params.sim is present
-        <NavButton href={params.sim}>Run Simulation</NavButton>
+        <NavButton className="me-2" href={params.sim}>
+          Run Simulation
+        </NavButton>
       }
       {params.nb && // Return NavButton element if params.nb is present
-        <NavButton href={params.nb}>View Notebook</NavButton>
+        <NavButton className="me-2" href={params.nb}>
+          View Notebook
+        </NavButton>
       }
       {params.repo && // Return Button element if params.repo is present
         <Button onClick={() => window.open(params.repo)}>

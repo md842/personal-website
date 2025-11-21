@@ -45,7 +45,7 @@ export function Component(){
   return(
     <main>
       <h1 className="mb-4">Earth Impact Simulator</h1>
-      <div className="description">
+      <div className="mb-3">
         <p className="long-desc">
           A physics simulation of the impact of a meteor striking Earth. By
           altering the initial parameters for the meteor's radius and
@@ -71,7 +71,9 @@ export function Component(){
         <p>
           Tags: Computer Graphics, OpenGL/WebGL, GLSL (OpenGL Shading Language), JavaScript, CUDA, Full-stack, Front-end, Back-end
         </p>
-        <NavButton href="/projects">Back to projects</NavButton>
+        <NavButton className="me-2" href="/projects">
+          Back to projects
+        </NavButton>
         <Button onClick={() => window.open("https://github.com/md842/earth-impact-simulator")}>
           View repository on GitHub
         </Button>

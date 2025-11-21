@@ -8,6 +8,8 @@ interface ButtonParams{
   href: string;
   // Text to display on button.
   children: string;
+  // Optional CSS class name.
+  className?: string;
   // react-bootstrap variant to use. Defaults to primary.
   variant?: string;
 }
@@ -17,6 +19,7 @@ export default function NavButton(params: ButtonParams){
 
   return(
     <Button
+      className={params.className}
       variant={params.variant ?? "primary"}
       onClick={() => navigate(params.href)}
     >

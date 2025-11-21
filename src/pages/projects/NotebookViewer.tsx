@@ -73,10 +73,12 @@ export default class NotebookViewer extends React.Component<{}, Notebook>{
     return(
       <main>
         <h1 className="mb-4">{this.state.title}</h1>
-        <div className="description">
+        <div className="mb-3">
           <p className="long-desc">{this.state.long_desc}</p>
           <p>{this.state.tags}</p>
-          <NavButton href="/projects">Back to projects</NavButton>
+          <NavButton className="me-2" href="/projects">
+            Back to projects
+          </NavButton>
           {(this.state.repo) && // Render only if repo is defined
             <Button onClick={() => window.open(this.state.repo)}>
               View repository on GitHub

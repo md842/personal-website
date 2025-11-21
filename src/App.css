@@ -1,36 +1,44 @@
 /* All pages common styling */
 
 body{
-  font-family: "Noto Sans", system-ui;
-  font-weight: 300;
+  /* Override Bootstrap default font family/font weights */
+  font-family: "Noto Sans", var(--bs-body-font-family) !important;
+  font-weight: 300 !important;
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6, .form-control{
   font-weight: 300;
 }
 
-a{
-  color: var(--bs-body-color); /* Set link color to text color */
-}
-
 main{
   margin: 0% 10% 0% 10%; /* top, right, bottom, left */
 }
 
-.btn-primary{
-  font-weight: 300;
-  margin-right: 0.5em;
+/* Override link colors for both light and dark themes */
+[data-bs-theme="dark"], [data-bs-theme="light"]{
+  --bs-link-color: var(--bs-body-color) !important;
+  --bs-link-hover-color: var(--bs-secondary-color) !important;
+
+  /* Bootstrap uses rgb variables instead of color variables in some scenarios,
+     such as <Button variant="link"/>, so override those too (see below). */
+  --bs-link-color-rgb: var(--bs-body-color-rgb) !important;
+}
+/* --bs-secondary-color-rgb is the same as --bs-body-color-rgb, with opacity
+   being the only distinguishing factor. So, --bs-link-hover-color-rgb must be
+   overriden with hardcoded values for each theme. These values correspond to a
+   color-mix of 75% --bs-secondary-color-rgb and 25% --bs-body-color-rgb,
+   effectively the equivalent of --bs-secondary-color. */
+[data-bs-theme="dark"]{
+  --bs-link-hover-color-rgb: 175, 179, 183 !important;
+}
+[data-bs-theme="light"]{
+  --bs-link-hover-color-rgb: 89, 92, 95 !important;
 }
 
 /* Project pages common styling */
-
-.description{
-  margin: 1em 0em; /* top/bottom, left/right */
-}
 
 .long-desc{
   /* Allows line breaks to show in long project descriptions. */
   white-space: pre-line;
   line-height: 1.25em;
-  padding-bottom: 0.625em;
 }

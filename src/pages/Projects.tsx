@@ -170,7 +170,7 @@ export default class Projects extends React.Component<{}, FilterState>{
     return(
       <main>
         <Form.Control
-          className="mb-3"
+          className="search-bar mb-3"
           onChange={(e) => this.handleSearchBarChange(e as any)}
           placeholder="Search for projects by title, category, or tags..."
         />
