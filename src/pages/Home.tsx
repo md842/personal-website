@@ -1,13 +1,13 @@
 import './Home.css';
 
-import {useState, useEffect} from 'react';
+import {type ReactNode, useState, useEffect} from 'react';
 
 import picture from '../assets/picture.jpg';
 import {Project, ProjectCard, readProjectData} from '../components/ProjectCard.tsx';
 
 import Carousel from 'react-bootstrap/Carousel';
 
-export default function Home(){
+export default function Home(): ReactNode{
   const [data, setData] = useState([{
     card_desc: "",
     title: "Loading from database...",

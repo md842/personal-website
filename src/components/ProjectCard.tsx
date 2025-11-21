@@ -1,6 +1,8 @@
+import {type ReactNode} from 'react';
+
 import {collection, getDocs} from "firebase/firestore";
-import db from '../components/firebaseConfig.ts';
-import NavButton from '../components/NavButton.tsx';
+import db from './firebaseConfig.ts';
+import NavButton from './NavButton.tsx';
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -13,6 +15,8 @@ export interface Project{
   card_desc: string;
   // If present, card will display an image.                  Source: Database
   image?: string;
+  // If present, "Open" button will appear.                   Source: Database
+  ext?: string;
   // If present, "View Notebook" button will appear.          Source: Database
   nb?: string;
   // If present, "View repository" button will appear.        Source: Database
@@ -24,7 +28,7 @@ export interface Project{
 }
 
 /** Constructs a Card element given a Project object specified by params. */
-export function ProjectCard(params: Project): JSX.Element{
+export function ProjectCard(params: Project): ReactNode{
   let unraveledTags = ""; // Convert tags array to string
   params.tags.forEach(element => unraveledTags += element + ", ");
   unraveledTags = unraveledTags.substring(0, unraveledTags.length - 2);
@@ -44,6 +48,11 @@ export function ProjectCard(params: Project): JSX.Element{
             * mt-2 (0.5rem) here for easier vertical spacing on small screens
             * where the buttons must be rendered in different rows. */}
           <Card.Text className="mb-2">Tags: {unraveledTags}</Card.Text>
+          {params.ext && // Return Button element if params.ext is present
+            <Button className="mt-2" onClick={() => window.open(params.ext)}>
+              Visit External Site &nbsp;<i className="bi bi-box-arrow-up-right"/>
+            </Button>
+          }
           {params.sim && // Return NavButton element if params.sim is present
             <NavButton className="me-2 mt-2" href={params.sim}>
               Run Simulation
@@ -57,6 +66,7 @@ export function ProjectCard(params: Project): JSX.Element{
           {params.repo && // Return Button element if params.repo is present
             <Button className="mt-2" onClick={() => window.open(params.repo)}>
               View repository on GitHub
+              &nbsp;<i className="bi bi-box-arrow-up-right"/>
             </Button>
           }
         </div>
@@ -82,11 +92,12 @@ export async function readProjectData(all: boolean): Promise<Array<Array<Project
   dbQuery.forEach((doc) => { // For each document in the "projects" collection:
     if (all || doc.data().featured){ // Only create object if it will be used
       let projectObj: Project = {
-        card_desc: doc.data().card_desc,
         title: doc.data().title,
-        repo: doc.data().repo,
+        card_desc: doc.data().card_desc,
         image: doc.data().image,
+        ext: doc.data().ext,
         nb: doc.data().nb,
+        repo: doc.data().repo,
         sim: doc.data().sim,
         tags: doc.data().tags
       };
