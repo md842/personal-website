@@ -11,8 +11,7 @@ export default function Home(){
   const [data, setData] = useState([{
     card_desc: "",
     title: "Loading from database...",
-    tags: ["Loading from database..."],
-    vis: true
+    tags: ["Loading from database..."]
   }]); // Placeholder card to display while waiting for database
 
   useEffect(() => {
@@ -25,13 +24,13 @@ export default function Home(){
 
 	return(
     <main className="home">
-      <section>
+      <section className="text-center mb-3">
         <h1>Max Deng</h1>
-        <img src={picture}/>
+        <img className="mw-100 rounded-circle my-3" src={picture}/>
         <h5>Computer Science B.S.</h5>
         <h5>University of California Los Angeles (UCLA)</h5>
         <a href="https://github.com/md842" target="_blank">
-          <i className="bi bi-github"></i>
+          <i className="bi bi-github me-3"></i>
         </a>
         <a href="https://www.linkedin.com/in/maxdeng/" target="_blank">
           <i className="bi bi-linkedin"></i>
@@ -58,9 +57,8 @@ export default function Home(){
           Below is a selection of my favorite projects. I would be delighted if you took the time to view my full portfolio on the <a href="/projects">projects page</a>.
         </p>
         <Carousel>
-          {data.map((params:Project) => { // Create a carousel item for each
-            if (params.image) // featured project with an image.
-              return <Carousel.Item><ProjectCard {...params}/></Carousel.Item>;
+          {data.map((params: Project) => { // Create a carousel item for each
+            return <Carousel.Item><ProjectCard {...params}/></Carousel.Item>;
           })}
         </Carousel>
       </aside>

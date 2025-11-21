@@ -1,7 +1,3 @@
-import './ProjectCard.css'
-
-import {useState} from "react";
-
 import {collection, getDocs} from "firebase/firestore";
 import db from '../components/firebaseConfig.ts';
 import NavButton from '../components/NavButton.tsx';
@@ -25,47 +21,45 @@ export interface Project{
   sim?: string;
   // Tags associated with the project.                        Source: Database
   tags: Array<string>;
-  // The visibility of this card.                             Source: Section()
-  vis: boolean;
 }
 
 /** Constructs a Card element given a Project object specified by params. */
 export function ProjectCard(params: Project): JSX.Element{
-  const [visible, setVisible] = useState(params.vis);
-  if (params.vis != visible) // visible state is out of date
-    setVisible(params.vis); // Update visible state
-
   let unraveledTags = ""; // Convert tags array to string
   params.tags.forEach(element => unraveledTags += element + ", ");
   unraveledTags = unraveledTags.substring(0, unraveledTags.length - 2);
 
   return(
-    <Card className={visible ? "card-in" : "card-out"}>
+    <Card className="h-100"> {/* Expand card to fill available height */}
       {params.image && // Return img element if params.image is present
-        <Card.Img
-          className={visible ? "img-in" : "img-out"} // CSS animations
-          src={params.image}
-        />
+        <Card.Img src={params.image}/>
       }
-      <Card.Body className={visible ? "body-in" : "body-out"}>
-      <Card.Title>{params.title}</Card.Title>
-      <Card.Text>{params.card_desc}</Card.Text>
-      <Card.Text>Tags: {unraveledTags}</Card.Text>
-      {params.sim && // Return NavButton element if params.sim is present
-        <NavButton className="me-2" href={params.sim}>
-          Run Simulation
-        </NavButton>
-      }
-      {params.nb && // Return NavButton element if params.nb is present
-        <NavButton className="me-2" href={params.nb}>
-          View Notebook
-        </NavButton>
-      }
-      {params.repo && // Return Button element if params.repo is present
-        <Button onClick={() => window.open(params.repo)}>
-          View repository on GitHub
-        </Button>
-      }
+      <Card.Body className="d-flex flex-column justify-content-between">
+        <div className="mb-3"> {/* Align title/desc to top of card body */}
+          <Card.Title>{params.title}</Card.Title>
+          <Card.Text>{params.card_desc}</Card.Text>
+        </div>
+        <div> {/* Align tags/buttons to bottom of card body */}
+          {/* Standard margin-bottom for <p> is mb-3 (1rem); split into mb-2 and
+            * mt-2 (0.5rem) here for easier vertical spacing on small screens
+            * where the buttons must be rendered in different rows. */}
+          <Card.Text className="mb-2">Tags: {unraveledTags}</Card.Text>
+          {params.sim && // Return NavButton element if params.sim is present
+            <NavButton className="me-2 mt-2" href={params.sim}>
+              Run Simulation
+            </NavButton>
+          }
+          {params.nb && // Return NavButton element if params.nb is present
+            <NavButton className="me-2 mt-2" href={params.nb}>
+              View Notebook
+            </NavButton>
+          }
+          {params.repo && // Return Button element if params.repo is present
+            <Button className="mt-2" onClick={() => window.open(params.repo)}>
+              View repository on GitHub
+            </Button>
+          }
+        </div>
       </Card.Body>
     </Card>
   );
@@ -94,8 +88,7 @@ export async function readProjectData(all: boolean): Promise<Array<Array<Project
         image: doc.data().image,
         nb: doc.data().nb,
         sim: doc.data().sim,
-        tags: doc.data().tags,
-        vis: true // Initial visbility is always true
+        tags: doc.data().tags
       };
       if (doc.data().featured) // Featured, push to element 0 of output
         out[0].push(projectObj);
