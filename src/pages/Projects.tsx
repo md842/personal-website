@@ -81,7 +81,7 @@ export default function Projects(): ReactNode{
 
     return transitions((style, item) => (
       <animated.div className="project-card mb-3" style={style}>
-        <ProjectCard key={item.title} {...item}/>
+        <ProjectCard key={item.title} project={item}/>
       </animated.div>
     ))
   }

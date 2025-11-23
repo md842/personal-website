@@ -80,7 +80,7 @@ export default function Home(): ReactNode{
           {projects.map((project: Project) => { // Create a carousel item for each
             return(
               <Carousel.Item key={project.title}>
-                <ProjectCard {...project}/>
+                <ProjectCard homepage project={project}/>
               </Carousel.Item>
             );
           })}

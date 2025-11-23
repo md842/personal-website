@@ -1,5 +1,38 @@
-.translucent-btn{
-  opacity: 0.6;
+/* Classic card design styling */
+
+@media (max-width: 768px){
+  .card-btn{ /* Fill row on small screens, easier to press and looks better */
+    width: 100%;
+  }
+}
+
+/* Overlay design styling */
+
+:root{
+  --gradient-sm: linear-gradient(0,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.75) 20%,
+    rgba(0, 0, 0, 0.5) 40%,
+    rgba(0, 0, 0, 0) 60%
+  );
+  --gradient-md: linear-gradient(0,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.75) 15%,
+    rgba(0, 0, 0, 0.5) 30%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  --gradient-lg: linear-gradient(0,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.75) 10%,
+    rgba(0, 0, 0, 0.5) 20%,
+    rgba(0, 0, 0, 0) 40%
+  );
+  --gradient-xl: linear-gradient(0,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.75) 7.5%,
+    rgba(0, 0, 0, 0.5) 15%,
+    rgba(0, 0, 0, 0) 30%
+  );
 }
 
 .text-shadow-stack{
@@ -10,15 +43,126 @@
                0px 0px 0.5rem black;
 }
 
-.overlay-shadow::before {
+.translucent-btn{
+  opacity: 0.6;
+}
+
+.overlay-shadow::before, .overlay-shadow-home::before{
   content: ''; /* Shadow doesn't render without this */
   width: 100%;
   height: 100%;
   position: absolute;
-  background: linear-gradient(0, 
-    rgba(0, 0, 0, 0.9) 0%,
-    rgba(0, 0, 0, 0.75) 10%,
-    rgba(0, 0, 0, 0.5) 20%,
-    rgba(0, 0, 0, 0) 40%
-  );
+}
+
+/** Responsive scaling for card image overlay shadow; smaller card width means
+  * text will cover more of the image, so the gradient should reach higher.
+  * This section is for cards that are not part of the home page carousel.
+  * Row breakpoints:
+  * - 1 card per row: 768px ~ 1535px
+  * - 2 cards per row: 1536px ~ 3071px
+  * - 3 cards per row: >=3072px
+  */
+
+@media ((min-width: 768px) and (max-width: 899px)) or /* 1 card per row */
+       ((min-width: 1536px) and (max-width: 1919px)){ /* 2 cards per row */
+  /** Common resolutions at this breakpoint:
+    * - Portrait mode tablets (1 card per row)
+    * - 1536x864 == 1920x1080 @ 1.25x scaling (2 cards per row)
+    * - 1600x900 (2 cards per row)
+    * - 1707x960 == 2560x1440 @ 1.5x scaling (2 cards per row)
+    */
+  .overlay-shadow::before{
+    background: var(--gradient-sm);
+  }
+}
+
+@media ((min-width: 900px) and (max-width: 1079px)) or  /* 1 card per row */
+       ((min-width: 1920px) and (max-width: 2047px)) or /* 2 cards per row */
+       (min-width: 3072px){                             /* 3 cards per row */
+  /** Common resolutions at this breakpoint: 
+    * - Landscape mode phones (1 card per row)
+    * - 1920x1080 (2 cards per row)
+    * - 3072x1728 == 3840x2160 @ 1.25x scaling (3 cards per row)
+    */
+  .overlay-shadow::before{
+    background: var(--gradient-md);
+  }
+}
+
+@media ((min-width: 1080px) and (max-width: 1199px)) or /* 1 card per row */
+       ((min-width: 2048px) and (max-width: 2559px)) or /* 2 cards per row */
+       (min-width: 3240px){                             /* 3 cards per row */
+  /** Common resolutions at this breakpoint:
+    * - Landscape mode tablets (1 card per row)
+    * - 1080x1920 (1 card per row)
+    * - 2048x1152 == 2560x1440 @ 1.25x scaling (2 cards per row)
+    */
+  .overlay-shadow::before{
+    background: var(--gradient-lg);
+  }
+}
+
+@media ((min-width: 1200px) and (max-width: 1535px)) or /* 1 card per row */
+       ((min-width: 2560px) and (max-width: 3071px)) or /* 2 cards per row */
+        (min-width: 3840px){                            /* 3 cards per row */
+  /** Common resolutions at this breakpoint:
+    * - 1200x1920 (1 card per row)
+    * - 1280x720 == 1920x1080 @ 1.5x scaling (1 card per row)
+    * - 1366x768 (1 card per row)
+    * - 2560x1440 == 3840x2160 @ 1.5x scaling (2 cards per row)
+    * - 3840x2160 (3 cards per row)
+    */
+  .overlay-shadow::before{
+    background: var(--gradient-xl);
+  }
+}
+
+/* This section is for cards that are part of the home page carousel. The home
+   page breaks into two columns on landscape mode screens wider than 1279px. */
+
+@media ((min-width: 768px) and (max-width: 899px)) or      /* One column homepage */
+       ((orientation: landscape) and (min-width: 1280px)){ /* Two column homepage */
+  /** Common resolutions at this breakpoint:
+    * - Portrait mode tablets (one column homepage)
+    * - 1280x720 == 1920x1080 @ 1.5x scaling (two column homepage)
+    */
+  .overlay-shadow-home::before{
+    background: var(--gradient-sm);
+  }
+}
+
+@media ((min-width: 900px) and (max-width: 1079px)) or     /* One column homepage */
+       ((orientation: landscape) and (min-width: 1366px)){ /* Two column homepage */
+  /** Common resolutions at this breakpoint:
+    * - Landscape mode phones (one column homepage)
+    * - 1366x768 (two column homepage)
+    */
+  .overlay-shadow-home::before{
+    background: var(--gradient-md);
+  }
+}
+
+@media ((min-width: 1080px) and (max-width: 1199px)) or    /* One column homepage */
+       ((orientation: landscape) and (min-width: 1536px)){ /* Two column homepage */
+  /** Common resolutions at this breakpoint:
+    * - Landscape mode tablets (one column homepage)
+    * - 1080x1920 (one column homepage)
+    * - 1536x864 == 1920x1080 @ 1.25x scaling (two column homepage)
+    * - 1600x900 (two column homepage)
+    */
+  .overlay-shadow-home::before{
+    background: var(--gradient-lg);
+  }
+}
+
+@media ((orientation: portrait) and (min-width: 1200px)) or /* One column homepage */
+       ((orientation: landscape) and (min-width: 1536px)){  /* Two column homepage */
+  /** Common resolutions at this breakpoint:
+    * - 1200x1920 (one column homepage)
+    * - 1707x960 == 2560x1440 @ 1.5x scaling (two column homepage)
+    * - Anything higher than 1707x960
+    */
+  .overlay-shadow-home::before{
+    background: var(--gradient-xl);
+  }
 }

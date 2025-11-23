@@ -28,22 +28,20 @@
   }
 }
 
-/* Projects section styling */
+/** Responsive scaling for project cards. Row breakpoints:
+  * - 1 card per row: 768px ~ 1535px
+  * - 2 cards per row: 1536px ~ 3071px
+  * - 3 cards per row: >=3072px
+  */
 
-@media (min-width: 1600px){
+@media (min-width: 1536px){ /* Equivalent to 1920x1080 @ 1.25x scaling */
   .project-card{
     flex-basis: 49.75%; /* 2 cards per row */
   }
 }
 
-@media (min-width: 2560px){
+@media (min-width: 3072px){ /* Equivalent to 3840x2160 @ 1.25x scaling */
   .project-card{
-    flex-basis: 49.75%; /* 3 cards per row */
-  }
-}
-
-@media (min-width: 3840px){
-  .project-card{
-    flex-basis: 24.625%; /* 4 cards per row */
+    flex-basis: 33%; /* 3 cards per row */
   }
 }
