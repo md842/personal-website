@@ -36,8 +36,7 @@
   margin: 0; /* Resets the preexisting margin */
 }
 
-.carousel-indicators button{
-  /* Gets overriden without !important */
+.carousel-indicators button{ /* Control buttons follow light/dark mode */
   background-color: var(--bs-body-color) !important;
 }
 
@@ -46,4 +45,12 @@
   border-radius: var(--bs-border-radius);
   width: 2rem; /* Prevent overlap with card */
   height: calc(100% - 1.5rem); /* Align with card, exclude bottom padding */
+  /* Prevents filter from keeping buttons dark when dark mode is active */
+  filter: none;
+}
+
+/* When dark mode is active, invert color of arrow icons (dark on light bg) */
+[data-bs-theme="dark"] .carousel-control-prev-icon,
+[data-bs-theme="dark"] .carousel-control-next-icon{
+  filter: invert(100%); /* Make carousel controls visible */
 }

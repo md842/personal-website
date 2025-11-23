@@ -72,7 +72,7 @@ export default function SimInterface(): ReactNode{
         {data.long_desc!.map((paragraph: string, index: number) => (
           <p key={index}>{paragraph}</p>
         ))}
-        <p>{unravelTags(data.tags)}</p>
+        <p className="mt-5">{unravelTags(data.tags)}</p>
         {(data.cout_size) && // Render only if cout_size is defined
           // (All sims define it, so if undefined, the database read failed)
           <p>
@@ -96,8 +96,8 @@ export default function SimInterface(): ReactNode{
       </div>
       {(data.cout_size) && // Render only if cout_size is defined
         // (All sims define it, so if undefined, the database read failed)
-        <div className="border border-dark rounded-3">
-          <p className="bg-dark px-3 py-2 rounded-top text-white">
+        <div className="border rounded-3">
+          <p className="bg-dark border-bottom rounded-top px-3 py-2 text-white">
             C++ Back-end Interface
           </p>
           <Form className="px-3" onSubmit={(e) => handleSubmit(e)}>

@@ -48,7 +48,7 @@ export default function NotebookViewer(): ReactNode{
           <p key={index}>{paragraph}</p>
         ))}
         {data.tags &&
-          <p>{unravelTags(data.tags)}</p>
+          <p className="mt-5">{unravelTags(data.tags)}</p>
         }
         <NavButton className="me-2" href="/projects">
           Back to projects
