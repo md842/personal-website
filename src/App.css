@@ -34,11 +34,3 @@ main{
 [data-bs-theme="light"]{
   --bs-link-hover-color-rgb: 89, 92, 95 !important;
 }
-
-/* Project pages common styling */
-
-.long-desc{
-  /* Allows line breaks to show in long project descriptions. */
-  white-space: pre-line;
-  line-height: 1.25em;
-}

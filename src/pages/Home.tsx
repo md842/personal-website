@@ -76,9 +76,6 @@ export default function Home(): ReactNode{
         </p>
         <br/>
         <h3>Featured Projects</h3>
-        <p>
-          Below is a selection of my favorite projects. I would be delighted if you took the time to view my full portfolio on the <a href="/projects">projects page</a>.
-        </p>
         <Carousel>
           {projects.map((project: Project) => { // Create a carousel item for each
             return(

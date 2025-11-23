@@ -38,7 +38,7 @@
 
 @media (min-width: 2560px){
   .project-card{
-    flex-basis: 33%; /* 3 cards per row */
+    flex-basis: 49.75%; /* 3 cards per row */
   }
 }
 
