@@ -1,26 +1,25 @@
 import './Home.css';
 
-import {type ReactNode, useState, useEffect} from 'react';
+import {type ReactNode, useEffect, useState} from 'react';
 
 import picture from '../assets/picture.jpg';
-import {Project, ProjectCard, readProjectData} from '../components/ProjectCard.tsx';
+import {ProjectCard} from '../components/ProjectCard.tsx';
+import {type Project, getProjects} from '../components/core/project-data.ts';
 
 import Carousel from 'react-bootstrap/Carousel';
 
 export default function Home(): ReactNode{
-  const [data, setData] = useState([{
+  const [projects, setProjects] = useState([{
     card_desc: "",
     title: "Loading from database...",
     tags: ["Loading from database..."]
   }]); // Placeholder card to display while waiting for database
 
-  useEffect(() => {
-    async function getItems(){
-      // all = false: Read featured projects only
-      setData((await readProjectData(false))[0]);
-    }
-    getItems(); // Replaces placeholder with data from database, updates render
-  }, []);
+  useEffect(() => { // Performs database read on mount
+    getProjects()
+      .then(data => setProjects(data[0])) // Index 0: featured projects only
+      .catch(error => console.log("Database error:", error));
+  }, []); // Runs on mount
 
 	return(
     <main className="home">
@@ -81,8 +80,12 @@ export default function Home(): ReactNode{
           Below is a selection of my favorite projects. I would be delighted if you took the time to view my full portfolio on the <a href="/projects">projects page</a>.
         </p>
         <Carousel>
-          {data.map((params: Project) => { // Create a carousel item for each
-            return <Carousel.Item><ProjectCard {...params}/></Carousel.Item>;
+          {projects.map((project: Project) => { // Create a carousel item for each
+            return(
+              <Carousel.Item key={project.title}>
+                <ProjectCard {...project}/>
+              </Carousel.Item>
+            );
           })}
         </Carousel>
       </aside>

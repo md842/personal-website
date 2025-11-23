@@ -1,183 +1,139 @@
-import React from "react";
+import {type ReactNode, useEffect, useState} from "react";
 
-import {doc, getDoc} from "firebase/firestore";
-import db from '../../components/firebaseConfig.ts';
+import {type Project, getProject, unravelTags} from '../../components/core/project-data.ts';
 import NavButton from '../../components/NavButton.tsx';
 
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
-// Parameters relating to the I/O of each request.
-interface RequestIO{
-  // cerr output of the simulation.                           Source: Server
-  cerr?: string;
-  // cout output of the simulation.                           Source: Server
-  cout?: string;
-  // Default or user-specified input to the simulation.       Source: User/DB
-  input?: string;
-}
-
-// Parameters relating to the simulation that won't change after initial read.
-interface Simulation{
+export interface Simulation extends Project{
   // The name of the cerr textarea.                           Source: Database
   cerr_name?: string;
   // The size to render the cerr textarea with (in rows).     Source: Database
   cerr_size?: number;
   // The size to render the cout textarea with (in rows).     Source: Database
   cout_size?: number;
+  // The defaut input for the simulation.
+  default_input?: string;
   // Indicates whether the simulation input is raw or file.   Source: Database
   input_as_file?: boolean;
-  // Long form description of project for page display.       Source: Database
-  long_desc: string;
-  // Link to project repository.                              Source: Database
-  repo?: string;
-  // Tags associated with the project.                        Source: Database
-  tags?: string;
-  // Title of project.                                        Source: Database
-  title: string;
 }
 
-export default class SimInterface extends React.Component<{}, RequestIO & Simulation>{
-  constructor(props: {}) {
-    super(props);
-    this.state = { // Initialize state with placeholders
-      long_desc: "Loading from database...",
-      title: "Loading from database..."
-    };
+export default function SimInterface(): ReactNode{
+  const [data, setData] = useState({
+    long_desc: [""],
+    tags: [""],
+    title: "Loading from database..."
+  } as Simulation); // Placeholder data to display while waiting for database
 
-    this.read(); // Read simulation parameters and default input from database
-  }
-
-  handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({input: e.target.value}); // Set input state to changed text
-  }
-
-  async read(){
+  useEffect(() => { // Performs database read on mount
     // Remove "/projects/sim/" (length 14) from pathname for target id
     let target_id = window.location.pathname.substring(14);
-    const data = (await getDoc(doc(db, "projects", target_id))).data();
+    getProject<Simulation>(target_id)
+      .then(data => {
+        setData(data);
+        // Replace newlines in database output with actual newlines
+        setInput(data.default_input!.replace(/\\n/g, '\n'));
+      })
+      .catch(error => console.log("Database error:", error));
+  }, []); // Runs on mount
 
-    if (data){ // Document data is defined
-      let uDesc = ""; // Unravel long_desc array to string
-      data.long_desc.forEach((element: string) => uDesc += element + '\n\n');
+  // State variables for request I/O
+  const [input, setInput] = useState("");
+  const [cout, setCout] = useState("");
+  const [cerr, setCerr] = useState("");
 
-      let uTags = "Tags: "; // Unravel tags array to string
-      data.tags.forEach((element: string) => uTags += element + ", ");
-      uTags = uTags.substring(0, uTags.length - 2); // Remove the last comma
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault(); // Prevents refreshing page on form submission
 
-      this.setState({
-        // RequestIO: Set default input. Firestore stores \n as literal "\\n".
-        input: data.default_input.replaceAll("\\n", '\n'),
-        // Simulation (will not change after the initial read)
-        cerr_name: data.cerr_name,
-        cerr_size: data.cerr_size,
-        cout_size: data.cout_size,
-        input_as_file: data.input_as_file,
-        long_desc: uDesc,
-        repo: data.repo,
-        tags: uTags,
-        title: data.title
-      });
-    }
-    else{ // Document data is undefined
-      this.setState({
-        long_desc: "The requested simulation URL is most likely incorrect. If the URL is correct, then the database is currently unreachable.",
-        title: "Database read error"
-      });
-    }
-  }
-
-  submit(){
-    fetch('/', {
+    fetch('/', { // Send POST request to simulation backend
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: JSON.stringify({
-        "input": this.state.input,
-        "input_as_file": this.state.input_as_file,
+        "input": input,
+        "input_as_file": data.input_as_file,
         "source": window.location.pathname.substring(14),
       })
     })
     .then(response => response.json())
-    .then((data) => {
-      this.setState({ // Set RequestIO state to response data
-        cout: data.cout,
-        cerr: data.cerr,
-      });
+    .then((data) => { // Set output fields to response data
+      setCout(data.cout);
+      setCerr(data.cerr);
     })
     .catch((error) => {
-      this.setState({cout: error}); // Set RequestIO state to caught error
+      setCout(error); // Set output fields to caught error
     });
   }
 
-  render(){
-    return(
-      <main>
-        <h1 className="mb-4">{this.state.title}</h1>
-        <div className="mb-3">
-          <p className="long-desc">{this.state.long_desc}</p>
-          <p>{this.state.tags}</p>
-          {(this.state.cout_size) && // Render only if cout_size is defined
-            // (All sims define it, so if undefined, the database read failed)
-            <p>
-              This simulation runs on a custom interface that communicates with
-              the back-end via a POST request, using JSON encoded data to specify
-              an executable to run server-side and provide user-customizable
-              input for the executable. The web server runs the executable as a
-              background process, piping its output and encoding it as JSON
-              within an HTTP response. Security mechanisms are in place to
-              protect the server from excessive and/or unintended payloads.
-            </p>
-          }
-          <NavButton className="me-2" href="/projects">
-            Back to projects
-          </NavButton>
-          {(this.state.repo) && // Render only if repo is defined
-            <Button onClick={() => window.open(this.state.repo)}>
-              View repository on GitHub
-            </Button>
-          }
-        </div>
-        {(this.state.cout_size) && // Render only if cout_size is defined
+  return(
+    <main>
+      <h1 className="mb-4">{data.title}</h1>
+      <div className="mb-3">
+        {data.long_desc!.map((paragraph: string, index: number) => (
+          <p key={index}>{paragraph}</p>
+        ))}
+        <p>{unravelTags(data.tags)}</p>
+        {(data.cout_size) && // Render only if cout_size is defined
           // (All sims define it, so if undefined, the database read failed)
-          <div className="border border-dark rounded-3">
-            <p className="bg-dark px-3 py-2 rounded-top text-white">
-              C++ Back-end Interface
-            </p>
-            <Form className="px-3">
-              <Form.Group className="mb-3" controlId="cpp-input">
-                <Form.Label>Input</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  className="mb-3"
-                  rows={10}
-                  onChange={(e) => this.handleChange(e as any)}
-                  value={this.state.input}
-                />
-                <Button onClick={() => {this.submit()}}>Submit</Button>
-              </Form.Group>
-              <Form.Label>Output</Form.Label>
+          <p>
+            This simulation runs on a custom interface that communicates with
+            the back-end via a POST request, using JSON encoded data to specify
+            an executable to run server-side and provide user-customizable
+            input for the executable. The web server runs the executable as a
+            background process, piping its output and encoding it as JSON
+            within an HTTP response. Security mechanisms are in place to
+            protect the server from excessive and/or unintended payloads.
+          </p>
+        }
+        <NavButton className="me-2" href="/projects">
+          Back to projects
+        </NavButton>
+        {(data.repo) && // Render only if repo is defined
+          <Button onClick={() => window.open(data.repo)}>
+            View repository on GitHub
+          </Button>
+        }
+      </div>
+      {(data.cout_size) && // Render only if cout_size is defined
+        // (All sims define it, so if undefined, the database read failed)
+        <div className="border border-dark rounded-3">
+          <p className="bg-dark px-3 py-2 rounded-top text-white">
+            C++ Back-end Interface
+          </p>
+          <Form className="px-3" onSubmit={(e) => handleSubmit(e)}>
+            <Form.Group className="mb-3" controlId="cpp-input">
+              <Form.Label>Input</Form.Label>
               <Form.Control
                 as="textarea"
                 className="mb-3"
-                rows={this.state.cout_size}
-                value={this.state.cout}
-                readOnly
+                rows={10}
+                onChange={(e) => setInput(e.target.value)}
+                value={input}
               />
-              {(this.state.cerr_size) && // Render only if cerr_size is set
-                <>
-                  <Form.Label>{this.state.cerr_name}</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={this.state.cerr_size}
-                    value={this.state.cerr}
-                    readOnly
-                  />
-                </>
-              }
-            </Form>
-          </div>
-        }
-      </main>
-    );
-  }
+              <Button type="submit">Submit</Button>
+            </Form.Group>
+            <Form.Label>Output</Form.Label>
+            <Form.Control
+              as="textarea"
+              className="mb-3"
+              rows={data.cout_size}
+              value={cout}
+              readOnly
+            />
+            {(data.cerr_size) && // Render only if cerr_size is set
+              <>
+                <Form.Label>{data.cerr_name}</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={data.cerr_size}
+                  value={cerr}
+                  readOnly
+                />
+              </>
+            }
+          </Form>
+        </div>
+      }
+    </main>
+  );
 }

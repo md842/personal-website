@@ -3,9 +3,8 @@ import './Projects.css'
 import {type ReactNode, useEffect, useState} from "react";
 import {useTransition, animated} from '@react-spring/web'
 
-import {collection, getDocs} from "firebase/firestore";
-import db from '../components/firebaseConfig.ts';
-import {Project, ProjectCard, readProjectData} from '../components/ProjectCard.tsx';
+import {ProjectCard} from '../components/ProjectCard.tsx';
+import {type Project, getProjects, getTags} from '../components/core/project-data.ts';
 
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
@@ -19,22 +18,24 @@ interface Filter{
 
 export default function Projects(): ReactNode{
   // State variables to be populated by database
-  const [projectData, setProjectData] = useState([] as Project[][]);
-  const [filterButtonTags, setFilterButtonTags] = useState([] as string[]);
+  const [projects, setProjects] = useState([[], []] as Project[][]);
+  const [projectTags, setProjectTags] = useState(["Loading from database..."] as string[]);
 
   // Filter and search state variables
   const [filter, setFilter] = useState({} as Filter);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => { // Reads required data from database on mount
-    readProjectData(true) // all = true: Read all projects
-      .then(data => setProjectData(data))
-      .catch(error => console.error("Error reaching database:", error));
-
-    getDocs(collection(db, "tags")) // Read filter button tags from database
-      // Database returns documents, map document ids to a string array
-      .then(data => setFilterButtonTags(data.docs.map(doc => doc.id)))
-      .catch(error => console.error("Error reaching database:", error));
+  useEffect(() => { // Performs database read on mount
+    getProjects()
+      .then(data => setProjects(data)) // All projects
+      .catch(error => console.log("Database error:", error));
+    
+    getTags()
+      .then(data => setProjectTags(data))
+      .catch(error => {
+        setProjectTags(["Database error! Could not load tags."]);
+        console.log("Database error:", error);
+      });
   }, []); // Runs on mount
 
   /** Renders a project section, or appropriate message if none rendered. */
@@ -55,13 +56,13 @@ export default function Projects(): ReactNode{
           className="d-flex flex-wrap align-items-stretch mb-3"
           style={{gap: "0.5%"}} // Horizontal space between flex items
         >
-          {projectData.length == 0 && // Data not yet loaded from database
+          {props.data.length == 0 && // Data not yet loaded from database
             <p>Loading projects from database...</p>
           }
 
           <ProjectCards displayed={displayed}/>
 
-          {projectData.length > 0 && displayed.length == 0 &&
+          {props.data.length > 0 && displayed.length == 0 &&
             // Data is loaded from database but no cards are displayed
             <p>No projects were found that matched the filter settings.</p>
           }
@@ -142,7 +143,7 @@ export default function Projects(): ReactNode{
       <Container fluid className="mb-5" id="filter-container">
         <p id="filter-label">Or filter by tag(s):</p>
         <ToggleButtonGroup type="checkbox">
-          {filterButtonTags.map((tag: string) => (
+          {projectTags.map((tag: string) => (
             <ToggleButton key={tag} // Generate buttons from database tags.
               id={"filter-" + tag}
               type="checkbox"
@@ -164,8 +165,8 @@ export default function Projects(): ReactNode{
       </Container>
 
       <div> {/* Render project sections. */}
-        <Section title="Featured Projects" data={projectData[0]}/>
-        <Section title="Projects" data={projectData[1]}/>
+        <Section title="Featured Projects" data={projects[0]}/>
+        <Section title="Projects" data={projects[1]}/>
       </div>
     </main>
   );
