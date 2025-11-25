@@ -1,30 +1,31 @@
 /* Filter section styling */
 
-@media (max-width: 1599px){
-  /* Tag buttons render poorly below 1600px, hide them. */
-  #filter-container{
-    display: none;
-  }
+#btn-group .btn{
+  /* Prevent excessive flex-grow when only one or two buttons wrap over to the
+     last row. */
+  max-width: 12rem;
+}
 
-  .search-bar{ /* Add some space between search bar and projects. */
-    margin-bottom: 2em !important; /* Overriden by mb-3 without !important */
+/* Prevent wrapped filter buttons from occupying too much vertical space on
+   small screens by scaling font size and padding (thus reducing wrapping). */
+
+@media (max-width: 1200px){ /* Landscape mode tablets */
+  #btn-group .btn{
+    font-size: 0.9rem;
   }
 }
 
-@media (min-width: 1600px) and (max-width: 1919px){
-  /* Render tag buttons and label on separate lines (no flex). */
-  #filter-label{
-    margin: 0 1em 1em 0; /* top, right, bottom, left */
+@media (max-width: 991px){ /* Portrait mode tablets, landscape mode phones */
+  #btn-group .btn{
+    font-size: 0.8rem;
+    padding: 0.35rem 0.7rem; /* top/bottom, left/right */
   }
 }
 
-@media (orientation: landscape) and (min-width: 1920px){
-  /* If the window is at least 1920px wide, the tag buttons and label can be on the same line. */
-  #filter-container{
-    display: flex;
-  }
-  #filter-label{ /* Vertically align label based on button height */
-    margin: auto 1em auto 0; /* top, right, bottom, left */
+@media (max-width: 599px){ /* Portrait mode phones */
+  #btn-group .btn{
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem; /* top/bottom, left/right */
   }
 }
 

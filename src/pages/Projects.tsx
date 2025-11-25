@@ -6,7 +6,6 @@ import {useTransition, animated} from '@react-spring/web'
 import {ProjectCard} from '../components/ProjectCard.tsx';
 import {type Project, getProjects, getTags} from '../components/core/project-data.ts';
 
-import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
@@ -19,11 +18,13 @@ interface Filter{
 export default function Projects(): ReactNode{
   // State variables to be populated by database
   const [projects, setProjects] = useState([[], []] as Project[][]);
-  const [projectTags, setProjectTags] = useState(["Loading from database..."] as string[]);
+  const [projectTags, setProjectTags] = useState([] as string[]);
 
   // Filter and search state variables
   const [filter, setFilter] = useState({} as Filter);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const filterButtonClassName: string = "mb-2";
 
   useEffect(() => { // Performs database read on mount
     getProjects()
@@ -37,6 +38,38 @@ export default function Projects(): ReactNode{
         console.log("Database error:", error);
       });
   }, []); // Runs on mount
+
+  useEffect(() => { // Fixes rounded borders on flex wrapped tag filter buttons
+    // useEffect runs on mount, ignore by checking database read completion
+    if (projectTags.length > 0){ // Database read finished
+      const onResize = () => { // Window resize event handler
+        // Gets the ToggleButtonGroup that contains the tag filter buttons
+        const btnGroup = document.getElementById("btn-group");
+        /* Each ToggleButton consists of an invisible input element and a label
+           element with className btn; we are only interested in the labels. */
+        let btns: NodeListOf<HTMLElement> = btnGroup!.querySelectorAll<HTMLElement>(".btn");
+
+        for (let i = 0; i < btns.length; i++) // Reset borders of all btns
+          btns[i].className = filterButtonClassName + " btn btn-primary";
+
+        for (let i = 0; i < btns.length - 1; i++){ // For each button
+          // If y-pos of btns[i] != y-pos of btns[i + 1], flex wraps at btns[i]
+          if (btns[i].getBoundingClientRect().y != btns[i + 1].getBoundingClientRect().y){
+            btns[i].className += " rounded-end"; // End of current row
+            btns[i + 1].className += " rounded-start"; // Start of next row
+          }
+        }
+        // Restore rounded start to first button
+        btns[0].className += " rounded-start";
+      }
+      window.addEventListener("resize", onResize);
+      onResize(); // Run once to set initial size
+      
+      return() => { // useEffect cleanup; removes event listener
+        window.removeEventListener("resize", onResize);
+      }
+    }
+  }, [projectTags]); // Runs when database read finishes (projectTags changes)
 
   /** Renders a project section, or appropriate message if none rendered. */
   function Section(props: {title: string, data: Project[]}): ReactNode{
@@ -137,32 +170,33 @@ export default function Projects(): ReactNode{
         className="search-bar mb-3"
         // Set to lowercase for case insensitive search.
         onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
-        placeholder="Search for projects by title, category, or tags..."
+        placeholder="Search for projects by title or category..."
       />
 
-      <Container fluid className="mb-5" id="filter-container">
-        <p id="filter-label">Or filter by tag(s):</p>
-        <ToggleButtonGroup type="checkbox">
-          {projectTags.map((tag: string) => (
-            <ToggleButton key={tag} // Generate buttons from database tags.
-              id={"filter-" + tag}
-              type="checkbox"
-              defaultChecked={filter[tag]}
-              value={tag}
-              onChange={(e) => 
-                setFilter({
-                  ...filter,
-                  // Use button name as a key, set boolean to checked state
-                  [e.currentTarget.value]: e.currentTarget.checked
-                })
-              }
-            >
-              {tag}
-            </ToggleButton>)
-            )
-          }
-        </ToggleButtonGroup>
-      </Container>
+      <ToggleButtonGroup className="align-items-stretch flex-wrap mb-5" id="btn-group" type="checkbox">
+        <div className="d-flex mb-2 align-items-center">
+          <p className="me-2 mb-0">Or filter by tag(s):</p>
+        </div>
+        {projectTags.map((tag: string) => (
+          <ToggleButton key={tag} // Generate buttons from database tags
+            className={filterButtonClassName}
+            id={"filter-" + tag}
+            type="checkbox"
+            defaultChecked={filter[tag]}
+            value={tag}
+            onChange={(e) => 
+              setFilter({
+                ...filter,
+                // Use button name as a key, set boolean to checked state
+                [e.currentTarget.value]: e.currentTarget.checked
+              })
+            }
+          >
+            {tag}
+          </ToggleButton>)
+          )
+        }
+      </ToggleButtonGroup>
 
       <div> {/* Render project sections. */}
         <Section title="Featured Projects" data={projects[0]}/>

@@ -21,8 +21,8 @@ export function ProjectCard(props: ProjectCardProps): ReactNode{
      else use card design. Just init false, will be determined on mount. */
   const [useOverlay, setUseOverlay] = useState(false);
 
-  useEffect(() => { // Adds an event listener for window resizing
-    const onResize = () => { // Re-determine overlay eligibility on resize
+  useEffect(() => { // Re-determine overlay eligibility on window resize
+    const onResize = () => { // Window resize event handler
       setUseOverlay(project.image != undefined && window.innerWidth >= 768);
     }
     window.addEventListener("resize", onResize);
