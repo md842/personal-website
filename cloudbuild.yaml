@@ -1,0 +1,34 @@
+steps:
+  # Install npm dependencies
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['ci']
+    id: 'Install npm dependencies'
+
+  # Build npm frontend
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+    id: 'Build npm frontend'
+
+  # Compress production frontend tarball
+  - name: 'alpine'
+    args: ['tar', '-czvf', 'build.tar.gz', 'build']
+    id: 'Compress production frontend tarball'
+
+  # Push production frontend tarball to Google Cloud Storage
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['cp', 'build.tar.gz', 'gs://${PROJECT_ID}_cloudbuild']
+    id: 'Push production frontend tarball'
+
+  # Invoke backend webhook cloud build trigger
+  - name: 'gcr.io/cloud-builders/curl'
+    args: [
+      '-X', 'POST',
+      '-H', 'Content-type: application/json',
+      'https://cloudbuild.googleapis.com/v1/projects/$PROJECT_ID/locations/$LOCATION/triggers/${_TRIGGER_NAME}:webhook?key=${_API_KEY}&secret=${_SECRET_VALUE}&trigger=${_TRIGGER_NAME}&projectId=$PROJECT_ID',
+      '-d', '{}'
+    ]
+
+# Cloud build options
+serviceAccount: '$SERVICE_ACCOUNT_EMAIL'
+options:
+  logging: CLOUD_LOGGING_ONLY
