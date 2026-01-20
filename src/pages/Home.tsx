@@ -7,7 +7,8 @@ import {ProjectCard} from '../components/ProjectCard.tsx';
 import {type Project, getProjects} from '../components/core/project-data.ts';
 
 import Carousel from 'react-bootstrap/Carousel';
-import {Link, scrollSpy} from 'react-scroll';
+import Nav from 'react-bootstrap/Nav';
+import {useScroll, animated} from '@react-spring/web'
 
 export default function Home(): ReactNode{
   const [projects, setProjects] = useState([{
@@ -16,20 +17,22 @@ export default function Home(): ReactNode{
     tags: ["Loading from database..."]
   }]); // Placeholder card to display while waiting for database
 
-  useEffect(() => { // Performs database read on mount
-    getProjects()
+  useEffect(() => {
+    getProjects() // Perform database read on mount
       .then(data => setProjects(data[0])) // Index 0: featured projects only
       .catch(error => console.log("Database error:", error));
   }, []); // Runs on mount
 
-  scrollSpy.update(); // Initialize scrollSpy on mount; sets active link
-
-  // Used to compute header size for scrolling offsets
-  let rem: number = parseInt(getComputedStyle(document.documentElement).fontSize);
+  const [activePage, setActivePage] = useState(0); // Custom scrollspy
+  const {scrollYProgress} = useScroll({ // scrollYProgress used by animated.div
+    onChange: ({value: {scrollYProgress}}) => { // Custom scrollspy
+      setActivePage(Math.trunc(scrollYProgress * 3));
+    },
+  });
 
 	return(
     <main className="home m-0"> {/* Override default margin on main element */}
-      <section className="text-center bg-dark-subtle">
+      <section className="text-center bg-dark-subtle"> {/* Profile */}
         <h1>Max Deng</h1>
         <img className="mw-100 rounded-circle my-3" src={picture}/>
         <h5>Computer Science B.S.</h5>
@@ -40,30 +43,25 @@ export default function Home(): ReactNode{
         <a href="https://www.linkedin.com/in/maxdeng/" target="_blank">
           <i className="bi bi-linkedin"></i>
         </a>
-        <div className="quick-nav d-flex flex-column">
-          <Link to="about-me" spy={true} // Highlight on scroll
-            smooth={true} duration={50} // Animate scroll
-            offset={-4 * rem} // Offset 4rem header size
-          >
+        <Nav defaultActiveKey="#about-me" className="quick-nav flex-column">
+          <Nav.Link href="#about-me" active={activePage == 0}>
             About Me
-          </Link>
-          <Link to="featured-projects" spy={true} // Highlight on scroll
-            smooth={true} duration={50} // Animate scroll
-            offset={-4 * rem} // Offset 4rem header size
-          >
+          </Nav.Link>
+          <Nav.Link href="#featured-projects" active={activePage == 1}>
             Featured Projects
-          </Link>
-          <Link to="about-this-website" spy={true} // Highlight on scroll
-            smooth={true} duration={50} // Animate scroll
-            offset={-4 * rem} // Offset 4rem header size
-          >
+          </Nav.Link>
+          <Nav.Link href="#about-this-website" active={activePage >= 2}>
             About This Website
-          </Link>
-        </div>
+          </Nav.Link>
+        </Nav>
       </section>
 
-      <aside>
-        <div className="page" id="about-me">
+      <aside> {/* Pages */}
+        <animated.div className="page" id="about-me"
+          style={{opacity: scrollYProgress.to(val =>
+            2 - (5 * val) // Fade out between 0.2 ~ 0.4
+          )}}
+        >
           <h3 className="dyn-0">About Me</h3>
           <p className="dyn-3">
             I am a passionate and driven computer science graduate who strives
@@ -73,8 +71,15 @@ export default function Home(): ReactNode{
             I graduated from UCLA with a B.S. in Computer Science in December
             2024 and am currently seeking employment opportunities.
           </p>
-        </div>
-        <div className="page" id="featured-projects">
+        </animated.div>
+        
+        <animated.div className="page" id="featured-projects"
+          style={{opacity: scrollYProgress.to(val =>
+            (val < 0.4) ? (3 * val) - 0.2 : // Fade in between 0.067 ~ 0.4
+            ((val > 0.6) ? 2.8 - (3 * val) : // Fade out between 0.6 ~ 0.933
+              1) // Peak opacity between 0.4 and 0.6
+          )}}
+        >
           <h3 className="dyn-3">Featured Projects</h3>
           <p className="dyn-1-5 mb-2">
             Below is a selection of my favorite projects. I would be delighted
@@ -90,8 +95,13 @@ export default function Home(): ReactNode{
               );
             })}
           </Carousel>
-        </div>
-        <div className="page" id="about-this-website">
+        </animated.div>
+        
+        <animated.div className="page" id="about-this-website"
+          style={{opacity: scrollYProgress.to(val =>
+            (5 * val) - 3 // Fade in between 0.6 ~ 0.8
+          )}}
+        >
           <h3 className="dyn-3">About This Website</h3>
           <p className="dyn-1-5">
             I've put a unique twist on the classic personal portfolio website
@@ -123,7 +133,7 @@ export default function Home(): ReactNode{
             a database rather than hardcoded, which allows me to easily add new
             projects to my portfolio without having to change any source files.
           </p>
-        </div>
+        </animated.div>
       </aside>
     </main>
 	);

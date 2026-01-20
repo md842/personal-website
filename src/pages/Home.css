@@ -19,6 +19,9 @@
   }
 
   .page{ /* Separate "pages" with dividers */
+    /* TODO: Consider fully disabling animations when not needed instead of
+       ignoring them for performance reasons. */
+    opacity: 1 !important; /* Ignore animations on mobile/vertical screens */
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--bs-dark-border-subtle);
     margin-bottom: 2rem;
@@ -27,9 +30,12 @@
 
 /* Desktop screens - use side-by-side design */
 @media (orientation: landscape) and (min-width: 1280px){
+  html{
+    scroll-padding-top: 4rem; /* Offset scrolling by header size 4rem */
+  }
+
   .home section{
     position: fixed; /* Profile section does not scroll */
-    left: 0;
     width: 40%;
     height: 100%; /* For background color cover */
     padding: 4rem;
@@ -45,8 +51,8 @@
   }
 
   .page{
-    height: calc(100vh - 4rem); /* Covers the entire viewport */
-    /* Vertically centers the page contents */
+    height: calc(100vh - 4rem); /* Cover an entire viewport */
+    /* Vertically center the page contents */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -59,7 +65,7 @@
     gap: 0.125rem; /* Reduce gap between items */
   }
 
-  .quick-nav a{
+  .quick-nav .nav-link{
     text-align: right;
     text-decoration: none;
     padding: 0.5rem;
@@ -67,7 +73,7 @@
     border-right: 0.125rem solid var(--bs-dark-border-subtle);
   }
 
-  .quick-nav a.active{
+  .quick-nav .nav-link.active{
     border-right-color: var(--bs-body-color);
     font-weight: bold;
   }

@@ -46,6 +46,7 @@ export default function Header(){
           </Nav>
           <Button variant="link"
             onClick={() => setDarkMode(prev => !prev)}
+            style={{height: "3rem"}}
           >
             <i className={"fs-2 lh-1 " + // Bootstrap styling
               /* Bootstrap icon determined by dark mode setting;
