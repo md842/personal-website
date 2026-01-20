@@ -18,10 +18,10 @@ export default function Header(){
       }
       catch(e){ // Error parsing storedDarkMode from string to boolean
         // May occur if local stored data was corrupted or tampered with
-        return false; // Default to false (light mode)
+        return true; // Default to true (dark mode)
       }
     }
-    return false; // If undefined (first visit), default to false (light mode)
+    return true; // If undefined (first visit), default to true (dark mode)
   }
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function Header(){
 
   return(
     <header className="sticky-top">
-      <Navbar className="mb-5" bg="dark" data-bs-theme="dark">
+      <Navbar bg="secondary-subtle" data-bs-theme="dark">
         <Container>
           <Nav
             activeKey={'/' + useLocation().pathname.split('/')[1]}

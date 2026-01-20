@@ -11,7 +11,7 @@ body{
 }
 
 main{
-  margin: 0% 10% 0% 10%; /* top, right, bottom, left */
+  margin: 3rem 10% 0% 10%; /* top, right, bottom, left */
 }
 
 /* Override link colors for both light and dark themes */
