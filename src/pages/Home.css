@@ -1,6 +1,6 @@
 /* Mobile/vertical screens - use column design */
 @media (orientation: portrait) or (max-width: 1279px){
-  .home{ /* Display Profile section above About section */
+  .column-if-mobile{ /* Display Profile section above About section */
     display: flex;
     flex-direction: column;
   }
@@ -15,6 +15,10 @@
   }
 
   .quick-nav{
+    display: none;
+  }
+
+  .scroll-icon{
     display: none;
   }
 
@@ -50,12 +54,33 @@
     margin-left: 40%;
   }
 
+  .scroll-icon{
+    position: fixed;
+    bottom: 1rem;
+    width: calc(60% - 8rem); /* Aside has width 60% with 4rem padding */
+    text-align: center;
+  }
+
   .page{
     height: calc(100vh - 4rem); /* Cover an entire viewport */
     /* Vertically center the page contents */
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .pc-desc{ /* Description text for "Max's Custom Computers" page */
+    /* Vertically center the text */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Control width of carousel */
+    flex-basis: 45%;
+    margin-right: 4rem;
+  }
+
+  .pc-carousel{
+    flex-basis: 55%; /* Control width of carousel */
   }
 
   .quick-nav{ /* Fixed at bottom right corner of profile section */
@@ -78,25 +103,6 @@
     font-weight: bold;
   }
 
-  /* On extra small desktop screens (e.g., 1280x720, 1366x768), move quick-nav
-     closer to the bottom corner of the profile section to prevent overlapping.
-     Note that 1280x720 is the lowest resolution where quick-nav renders. */
-  @media (orientation: landscape) and (max-height: 768px){
-    .quick-nav{
-      line-height: 1rem;
-      bottom: 1rem;
-      right: calc(60% + 1rem);
-    }
-  }
-
-  /* On small desktop screens, limit the size of the profile image to prevent
-     overlapping with quick-nav. */
-  @media (orientation: landscape) and (max-height: 1079px){
-    .home section img{
-      max-height: 50%;
-    }
-  }
-
   /* Dynamic font sizing; applies only when side-by-side design is applied. */
   .dyn-0{
     display: none;
@@ -113,6 +119,38 @@
   .dyn-3{
     font-size: 3rem;
     margin-bottom: 1rem;
+  }
+
+  /* Adjustments for small desktop screens (< 1920x1080). */
+  @media (orientation: landscape) and (max-height: 1079px){
+    .home section img{ /* Limit image size to prevent overlap with quick-nav */
+      max-height: 50%;
+    }
+  }
+
+  /* Adjustments for extremely small desktop screens (< 1920x1080 @ 1.25x). */
+  @media (orientation: landscape) and (max-height: 863px){
+    .home section{ /* Reduce padding to prevent overlap with quick-nav. */
+      padding-top: 2rem;
+    }
+
+    .quick-nav{ /* Avoid overlap with profile section */
+      line-height: 1rem; /* Makes quick-nav more compact */
+      bottom: 0.5rem; /* Move closer to bottom */
+      right: calc(60% + 0.5rem); /* Move closer to right edge */
+    }
+
+    .dyn-1-5{ /* Clamp dynamic font sizes to a maximum equivalent to 14px. */
+      font-size: min(1.5rem, 21px);
+    }
+
+    .dyn-2{
+      font-size: min(2rem, 28px);
+    }
+
+    .dyn-3{
+      font-size: min(3rem, 42px);
+    }
   }
 }
 

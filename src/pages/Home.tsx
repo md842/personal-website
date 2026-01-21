@@ -23,15 +23,35 @@ export default function Home(): ReactNode{
       .catch(error => console.log("Database error:", error));
   }, []); // Runs on mount
 
+  const numPages: number = 4;
+
+  /* Debug info
+  let rem: number = parseInt(getComputedStyle(document.documentElement).fontSize);
+  let headerSize: number = 4 * rem;
+  let footerSize: number = 7.5 * rem;
+  let pageHeight: number = window.innerHeight - headerSize;
+  let pagesHeight: number = numPages * pageHeight;
+  let scrollableHeight: number = pagesHeight + footerSize;
+  let totalHeight: number = scrollableHeight + headerSize;
+
+  console.log("pageHeight:", pageHeight,
+              "pagesHeight:", pagesHeight,
+              "scrollableHeight:", scrollableHeight,
+              "totalHeight:", totalHeight);
+  */
+
   const [activePage, setActivePage] = useState(0); // Custom scrollspy
   const {scrollYProgress} = useScroll({ // scrollYProgress used by animated.div
     onChange: ({value: {scrollYProgress}}) => { // Custom scrollspy
-      setActivePage(Math.trunc(scrollYProgress * 3));
+      /* Debug info
+      console.log("scrollYProgress:", scrollYProgress, scrollYProgress * scrollableHeight + "px");
+      */
+      setActivePage(~~(scrollYProgress * numPages)); // Fast truncate using NOT
     },
   });
 
 	return(
-    <main className="home m-0"> {/* Override default margin on main element */}
+    <main className="home column-if-mobile m-0"> {/* Override default margin on main element */}
       <section className="text-center bg-dark-subtle"> {/* Profile */}
         <h1>Max Deng</h1>
         <img className="mw-100 rounded-circle my-3" src={picture}/>
@@ -50,7 +70,10 @@ export default function Home(): ReactNode{
           <Nav.Link href="#featured-projects" active={activePage == 1}>
             Featured Projects
           </Nav.Link>
-          <Nav.Link href="#about-this-website" active={activePage >= 2}>
+          <Nav.Link href="#maxs-custom-computers" active={activePage == 2}>
+            Max's Custom Computers
+          </Nav.Link>
+          <Nav.Link href="#about-this-website" active={activePage >= 3}>
             About This Website
           </Nav.Link>
         </Nav>
@@ -59,8 +82,7 @@ export default function Home(): ReactNode{
       <aside> {/* Pages */}
         <animated.div className="page" id="about-me"
           style={{opacity: scrollYProgress.to(val =>
-            2 - (5 * val) // Fade out between 0.2 ~ 0.4
-          )}}
+            1 - (5 * (val - 0.05)))}} // Fade out: 0.05 ~ 0.25
         >
           <h3 className="dyn-0">About Me</h3>
           <p className="dyn-3">
@@ -71,22 +93,26 @@ export default function Home(): ReactNode{
             I graduated from UCLA with a B.S. in Computer Science in December
             2024 and am currently seeking employment opportunities.
           </p>
+          <animated.div className="scroll-icon"
+            style={{opacity: scrollYProgress.to(val =>
+              1 - (20 * val))}} // Fade out: 0 ~ 0.05
+          >
+            <i className="bi bi-chevron-down fs-1"/>
+          </animated.div>
         </animated.div>
         
         <animated.div className="page" id="featured-projects"
           style={{opacity: scrollYProgress.to(val =>
-            (val < 0.4) ? (3 * val) - 0.2 : // Fade in between 0.067 ~ 0.4
-            ((val > 0.6) ? 2.8 - (3 * val) : // Fade out between 0.6 ~ 0.933
-              1) // Peak opacity between 0.4 and 0.6
-          )}}
+            (val < 0.25) ? 5 * (val - 0.05) : // Fade in: 0.05 ~ 0.25
+            ((val > 0.375) ? 1 - (5 * (val - 0.375)) : // Fade out: 0.375 ~ 0.575
+              1))}} // Peak opacity: 0.25 ~ 0.375
         >
           <h3 className="dyn-3">Featured Projects</h3>
           <p className="dyn-1-5 mb-2">
-            Below is a selection of my favorite projects. I would be delighted
-            if you took the time to view my full portfolio on the&nbsp;
-            <a href="/projects">projects page</a>.
+            Below is a selection of my favorite projects. My full portfolio is
+            available on the <a href="/projects">projects page</a>.
           </p>
-          <Carousel className="w-100">
+          <Carousel className="project-carousel w-100">
             {projects.map((project: Project) => { // Create a carousel item for each
               return(
                 <Carousel.Item key={project.title}>
@@ -96,11 +122,59 @@ export default function Home(): ReactNode{
             })}
           </Carousel>
         </animated.div>
+
+        <animated.div className="page" id="maxs-custom-computers"
+          style={{opacity: scrollYProgress.to(val =>
+            (val < 0.575) ? 5 * (val - 0.375) : // Fade in: 0.375 ~ 0.575
+            ((val > 0.7) ? 1 - (5 * (val - 0.7)) : // Fade out: 0.7 ~ 0.9
+              1))}} // Peak opacity: 0.575 ~ 0.7
+        >
+          <div className="d-flex column-if-mobile">
+            <div className="pc-desc">
+              <h3 className="dyn-3">Max's Custom Computers</h3>
+              <p className="dyn-1-5 mb-2">
+                is a sole proprietorship I have been operating since 2020, with
+                hundreds of satisfied customers served all over the Bay Area.
+              </p>
+            </div>
+            <Carousel className="pc-carousel">
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/JIV4JEc.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/KrwooKs.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/vpF0D58.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/i41uIO0.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/TL5zQ84.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/ecKlC3q.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/3Uscp6W.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/HGJDZNg.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/g0wfLK0.jpeg"/>
+              </Carousel.Item>
+              <Carousel.Item>
+                <img className="img-fluid" src="https://i.imgur.com/QeKsuk7.jpeg"/>
+              </Carousel.Item>
+            </Carousel>
+          </div>
+        </animated.div>
         
         <animated.div className="page" id="about-this-website"
           style={{opacity: scrollYProgress.to(val =>
-            (5 * val) - 3 // Fade in between 0.6 ~ 0.8
-          )}}
+            5 * (val - 0.75))}} // Fade in: 0.75 ~ 0.95
         >
           <h3 className="dyn-3">About This Website</h3>
           <p className="dyn-1-5">
