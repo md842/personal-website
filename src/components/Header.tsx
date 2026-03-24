@@ -43,6 +43,7 @@ export default function Header(){
             <Navbar.Brand as={Link} to="/">Max Deng</Navbar.Brand>
             <Nav.Link as={Link} eventKey="/" to="/">Home</Nav.Link>
             <Nav.Link as={Link} eventKey="/projects" to="/projects">Projects</Nav.Link>
+            <Nav.Link as={Link} eventKey="/leetcode" to="/leetcode">LeetCode</Nav.Link>
           </Nav>
           <Button variant="link"
             onClick={() => setDarkMode(prev => !prev)}

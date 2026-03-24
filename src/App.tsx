@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import Projects from './pages/Projects';
 import NotebookViewer from './pages/projects/NotebookViewer';
 import SimInterface from './pages/projects/SimInterface';
+import LeetCode from './pages/LeetCode';
 import NoPage from './pages/NoPage'; // 404
 
 function Layout(){ /* Display the routed main between Header and Footer */
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
     {
       path: "projects/sim/*",
       element: <SimInterface/>,
+    },
+    {
+      path: "/leetcode",
+      element: <LeetCode/>,
     },
     {
       path: "*",
