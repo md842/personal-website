@@ -2,30 +2,19 @@ import {collection, doc, getDoc, getDocs} from "firebase/firestore";
 import db from '../firebaseConfig.ts';
 
 export interface Project{
-  // Document id of project.                                  Source: Database
-  id?: string;
+  id?: string; // Document id of project.
+  title: string; // Title of project.
+  featured?: number; // If defined, indicates index of featured project.
+  image?: string; // If present, card will display an image.
+  card_desc: string; // Short form description of project for card display.
+  long_desc?: string[]; // Long form description of project for page display.
+  tags: Array<string>; // Tags associated with the project.
 
-  // Title of project.                                        Source: Database
-  title: string;
-  // If defined, indicates index of featured project.         Source: Database
-  featured?: number;
-  // If present, card will display an image.                  Source: Database
-  image?: string;
-  // Short form description of project for card display.      Source: Database
-  card_desc: string;
-  // Long form description of project for page display.       Source: Database
-  long_desc?: string[];
-  // Tags associated with the project.                        Source: Database
-  tags: Array<string>;
-
-  // If present, "Open" button will appear.                   Source: Database
-  ext?: string;
-  // If present, "View Notebook" button will appear.          Source: Database
-  nb?: string;
-  // If present, "View repository" button will appear.        Source: Database
-  repo?: string;
-  // If present, "Run Simulation" button will appear.         Source: Database
-  sim?: string;
+  
+  ext?: string; // If present, "Open" button will appear.
+  nb?: string; // If present, "View Notebook" button will appear.
+  repo?: string; // If present, "View repository" button will appear.
+  sim?: string; // If present, "Run Simulation" button will appear.
 }
 
 /** Reads a project document from the database with a specific target_id.

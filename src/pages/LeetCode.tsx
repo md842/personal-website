@@ -1,86 +1,19 @@
 import {type ReactNode, useEffect, useState} from "react";
 
 import GradientScroll from '../components/GradientScroll';
+import {type LCSort, type LCSub, getLeetCode} from '../components/core/leetcode-data.ts';
 
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 
-interface LeetCodeSortable{
-  id: number; // Problem number
-  diff: number; // Problem difficulty (0 = Easy, 1 = Medium, 2 = Hard)
-  lang: number; // Submission programming language (0 = C, 1 = C++, 2 = Python)
-  runtimeBeats: number; // Percentage of submissions with worse runtime
-  memoryBeats: number; // Percentage of submissions with worse memory usage
-
-  // Initialized in useEffect hook
-  score: number; // Weighted score = (2 * runtimeBeats + memoryBeats) / 3
-}
-
-interface LeetCodeSubmission{
-  sortable: LeetCodeSortable; // Sortable elements of the submission
-
-  runtime: number; // In ms; not sortable because it means little by itself
-  memory: number; // In MB; not sortable because it means little by itself
-  title: string; // The name of the LeetCode problem
-  url: string; // The submission URL
-}
-
 export default function LeetCode(): ReactNode{
-  // Placeholder items to be replaced later
-  let exampleItem1: LeetCodeSubmission = {
-    sortable: {
-      id: 2906,
-      diff: 1,
-      lang: 2,
-      runtimeBeats: 75.72,
-      memoryBeats: 54.91
-    } as LeetCodeSortable,
-    runtime: 108,
-    memory: 44.33,
-    title: "Construct Product Matrix",
-    url: "https://leetcode.com/problems/construct-product-matrix/submissions/1957261727/"
-  }
-
-  let exampleItem2: LeetCodeSubmission = {
-    sortable: {
-      id: 1594,
-      diff: 1,
-      lang: 2,
-      runtimeBeats: 82.99,
-      memoryBeats: 56.89
-    } as LeetCodeSortable,
-    runtime: 3,
-    memory: 19.35,
-    title: "Maximum Non Negative Product in a Matrix",
-    url: "https://leetcode.com/problems/maximum-non-negative-product-in-a-matrix/submissions/1957102517"
-  }
-
-  let exampleItem3: LeetCodeSubmission = {
-    sortable: {
-      id: 3546,
-      diff: 1,
-      lang: 2,
-      runtimeBeats: 84.25,
-      memoryBeats: 41.1
-    } as LeetCodeSortable,
-    runtime: 106,
-    memory: 46.72,
-    title: "Equal Sum Grid Partition I",
-    url: "https://leetcode.com/problems/equal-sum-grid-partition-i/submissions/1958355260"
-  }
-
   // Populates the table. Can be sorted by sortByKey()
-  const [items, setItems] = useState([exampleItem1, exampleItem2, exampleItem3]);
+  const [items, setItems] = useState([] as LCSub[]);
 
-  useEffect(() => { // Initialize weighted scores and apply default sort
-    items.forEach((item) => { // Initialize weighted scores
-      // Weighted score = (2 * runtimeBeats + memoryBeats) / 3
-      item.sortable.score = (2 * item.sortable.runtimeBeats + item.sortable.memoryBeats) / 3
-      // Round to 2 decimal places
-      item.sortable.score = Math.round(item.sortable.score * 100) / 100
-    });
-
-    sortByKey("score", true); // Default sort: descending weighted score
+  useEffect(() => {
+    getLeetCode() // Perform database read on mount
+      .then(data => setItems(data))
+      .catch(error => console.log("Database error:", error));
   }, []); // Runs on mount
 
   // Provides dynamic colors for the Runtime Beats and Memory Beats columns
@@ -96,12 +29,12 @@ export default function LeetCode(): ReactNode{
   ]
 
   // Table headers are populated using map to reuse code for all columns
-  const tableHeaders: {key: keyof LeetCodeSortable, label: string}[] = [
+  const tableHeaders: {key: keyof LCSort, label: string}[] = [
     {key: "id", label: "Problem"},
     {key: "diff", label: "Difficulty"},
     {key: "lang", label: "Language"},
-    {key: "runtimeBeats", label: "Runtime (Beats)"},
-    {key: "memoryBeats", label: "Memory (Beats)"},
+    {key: "timeP", label: "Runtime (Beats)"},
+    {key: "memP", label: "Memory (Beats)"},
     {key: "score", label: "Weighted Score"}
   ]
 
@@ -109,10 +42,10 @@ export default function LeetCode(): ReactNode{
    *  by default, descending order if reverse = true. Called when a sort button
    *  on any column of the table header is clicked.
    */
-  function sortByKey(key: keyof LeetCodeSortable, reverse?: boolean){
+  function sortByKey(key: keyof LCSort, reverse?: boolean){
     setItems([...
       items.sort((obj1, obj2) => {
-      let a = obj1.sortable[key], b = obj2.sortable[key];
+      let a = obj1.sort[key], b = obj2.sort[key];
         return reverse ? b - a : a - b;
       })
     ]);
@@ -120,15 +53,10 @@ export default function LeetCode(): ReactNode{
 
   return(
     <main>
-      <p>Page under construction!</p>
       <p>
         Below is a sortable collection of all of my LeetCode submissions.
         Click on a problem name to be taken to the submission on LeetCode
         (opens in a new tab).
-      </p>
-      <p>
-        Weighted score follows the formula
-        (2 * runtime percentile + memory percentile) / 3.
       </p>
 
       <GradientScroll
@@ -145,6 +73,11 @@ export default function LeetCode(): ReactNode{
                 >
                   <div className="d-flex align-items-center">
                     {header.label}
+                    {header.key == "score" && // Tooltip for "Weighted Score"
+                      <i className="ms-2 bi bi-info-circle-fill"
+                        title="Weighted Score = (2 * runtime% + memory%) / 3"
+                      />
+                    }
                     <div className="d-flex flex-column ms-2">
                       <Button variant="link"
                         className="p-0 lh-1 d-flex align-items-center"
@@ -171,53 +104,59 @@ export default function LeetCode(): ReactNode{
 
           <tbody>
             {items.map((item) => ( // Populate table rows
-              <tr key={item.sortable.id}>
+              <tr key={item.sort.id}>
                 <td> {/* "Problem" column */}
-                  <a href={item.url} target="_blank">{item.sortable.id}. {item.title}</a>
+                  <a target="_blank"
+                    href={ // Build URL using problem title and submission ID
+                      "https://leetcode.com/problems/" +
+                      item.title.toLowerCase().replace(/\s/g, '-') +
+                      "/submissions/" + item.sub
+                    }
+                  >{item.sort.id}. {item.title}</a>
                 </td>
 
                 {/* "Difficulty" column */}
                 <td className={"text-" + ( // Bootstrap text color classes
-                    item.sortable.diff == 0 ? "success" : // Green
-                    item.sortable.diff == 1 ? "warning" : // Yellow
-                    "danger"                     // Red
+                    item.sort.diff == 0 ? "success" : // Green
+                    item.sort.diff == 1 ? "warning" : // Yellow
+                    "danger"                              // Red
                   )}
                 >
                   {
-                    item.sortable.diff == 0 ? "Easy" :
-                    item.sortable.diff == 1 ? "Medium" : "Hard"
+                    item.sort.diff == 0 ? "Easy" :
+                    item.sort.diff == 1 ? "Medium" : "Hard"
                   }
                 </td>
 
                 <td> {/* "Language" column */}
                   { // Set programming language text based on number
-                    item.sortable.lang == 0 ? "C" :
-                    item.sortable.lang == 1 ? "C++" :
-                    item.sortable.lang == 2 ? "Python" : "Other"
+                    item.sort.lang == 0 ? "C" :
+                    item.sort.lang == 1 ? "C++" :
+                    item.sort.lang == 2 ? "Python" : "Other"
                   }
                 </td>
 
                 <td> {/* Runtime (Beats) column */}
                   {/* Use <wbr/> to encourage wrap after "ms" if necessary */}
-                  {item.runtime} ms&nbsp;<wbr/>
-                  {/* Convert item.runtimeBeats to an index of colorScale (0-7) */}
-                  <span style={{color: colorScale[Math.min(7, item.sortable.runtimeBeats / 12.5 | 0)]}}>
-                    ({item.sortable.runtimeBeats}%)
+                  {item.time} ms&nbsp;<wbr/>
+                  {/* Convert item.timeP to an index of colorScale (0-7) */}
+                  <span style={{color: colorScale[Math.min(7, item.sort.timeP / 12.5 | 0)]}}>
+                    ({item.sort.timeP}%)
                   </span>
                 </td>
 
                 <td> {/* Memory (Beats) column */}
                   {/* Use <wbr/> to encourage wrap after "MB" if necessary */}
-                  {item.memory} MB&nbsp;<wbr/>
-                  {/* Convert item.memoryBeats to an index of colorScale (0-7) */}
-                  <span style={{color: colorScale[Math.min(7, item.sortable.memoryBeats / 12.5 | 0)]}}>
-                    ({item.sortable.memoryBeats}%)
+                  {item.mem} MB&nbsp;<wbr/>
+                  {/* Convert item.memP to an index of colorScale (0-7) */}
+                  <span style={{color: colorScale[Math.min(7, item.sort.memP / 12.5 | 0)]}}>
+                    ({item.sort.memP}%)
                   </span>
                 </td>
 
                 {/* Convert item.score to an index of colorScale (0-7) */}
-                <td style={{color: colorScale[Math.min(7, item.sortable.score / 12.5 | 0)]}}>
-                  {item.sortable.score}%
+                <td style={{color: colorScale[Math.min(7, item.sort.score / 12.5 | 0)]}}>
+                  {item.sort.score}%
                 </td>
               </tr>
             ))}
