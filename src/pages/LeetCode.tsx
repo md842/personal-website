@@ -75,7 +75,9 @@ export default function LeetCode(): ReactNode{
                     {header.label}
                     {header.key == "score" && // Tooltip for "Weighted Score"
                       <i className="ms-2 bi bi-info-circle-fill"
-                        title="Weighted Score = (2 * runtime% + memory%) / 3"
+                        title={"Weighted Score = (2 * runtime% + memory%) / 3"
+                        + "\nDifficulty multiplier: Easy = 1.0x, "
+                        + "Medium = 1.1x, Hard = 1.2x"}
                       />
                     }
                     <div className="d-flex flex-column ms-2">

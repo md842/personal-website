@@ -33,8 +33,11 @@ export async function getLeetCode(): Promise<LCSub[]>{
     let lcObj: LCSub = doc.data() as LCSub;
     lcObj.sort.id = Number(doc.id);
 
-    // Initialize weighted score: (2 * timeP + memP) / 3, rounded to 2 places
-    lcObj.sort.score = Math.round((2 * lcObj.sort.timeP + lcObj.sort.memP) / 3 * 100) / 100
+    // Initialize weighted score: (2 * timeP + memP) / 3
+    // Difficulty multiplier: Easy = 1.0, Medium = 1.1, Hard = 1.2
+    lcObj.sort.score = (2 * lcObj.sort.timeP + lcObj.sort.memP) / 3 * (1 + lcObj.sort.diff / 10);
+    // Round to 2 decimal places
+    lcObj.sort.score = Math.round(lcObj.sort.score * 100) / 100
 
     lcData.push(lcObj);
   });
