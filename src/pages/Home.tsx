@@ -25,7 +25,7 @@ export default function Home(): ReactNode{
 
   const numPages: number = 4;
 
-  /* Debug info
+  /* Custom scrollspy debug info
   let rem: number = parseInt(getComputedStyle(document.documentElement).fontSize);
   let headerSize: number = 4 * rem;
   let footerSize: number = 7.5 * rem;
@@ -43,7 +43,7 @@ export default function Home(): ReactNode{
   const [activePage, setActivePage] = useState(0); // Custom scrollspy
   const {scrollYProgress} = useScroll({ // scrollYProgress used by animated.div
     onChange: ({value: {scrollYProgress}}) => { // Custom scrollspy
-      /* Debug info
+      /* Custom scrollspy debug info
       console.log("scrollYProgress:", scrollYProgress, scrollYProgress * scrollableHeight + "px");
       */
       setActivePage(~~(scrollYProgress * numPages)); // Fast truncate using NOT
@@ -113,13 +113,11 @@ export default function Home(): ReactNode{
             available on the <a href="/projects">projects page</a>.
           </p>
           <Carousel className="project-carousel w-100">
-            {projects.map((project: Project) => { // Create a carousel item for each
-              return(
-                <Carousel.Item key={project.title}>
-                  <ProjectCard homepage project={project}/>
-                </Carousel.Item>
-              );
-            })}
+            {projects.map((project: Project) => (
+              <Carousel.Item key={project.title}>
+                <ProjectCard homepage project={project}/>
+              </Carousel.Item>
+            ))}
           </Carousel>
         </animated.div>
 
@@ -138,36 +136,16 @@ export default function Home(): ReactNode{
               </p>
             </div>
             <Carousel className="pc-carousel">
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/JIV4JEc.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/KrwooKs.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/vpF0D58.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/i41uIO0.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/TL5zQ84.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/ecKlC3q.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/3Uscp6W.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/HGJDZNg.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/g0wfLK0.jpeg"/>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img className="img-fluid" src="https://i.imgur.com/QeKsuk7.jpeg"/>
-              </Carousel.Item>
+              {
+                [ // imgur URLs
+                  "JIV4JEc", "KrwooKs", "vpF0D58", "i41uIO0", "TL5zQ84",
+                  "ecKlC3q", "3Uscp6W", "HGJDZNg", "g0wfLK0", "QeKsuk7"
+                ].map((imgur: string) => (
+                  <Carousel.Item>
+                    <img className="img-fluid" src={"https://i.imgur.com/" + imgur + ".jpeg"}/>
+                  </Carousel.Item>
+                ))
+              }
             </Carousel>
           </div>
         </animated.div>
