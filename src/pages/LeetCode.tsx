@@ -26,7 +26,7 @@ interface LeetCodeSubmission{
 }
 
 export default function LeetCode(): ReactNode{
-  // Placeholder item to be replaced later
+  // Placeholder items to be replaced later
   let exampleItem1: LeetCodeSubmission = {
     sortable: {
       id: 2906,
@@ -41,7 +41,6 @@ export default function LeetCode(): ReactNode{
     url: "https://leetcode.com/problems/construct-product-matrix/submissions/1957261727/"
   }
 
-  // Placeholder item to be replaced later
   let exampleItem2: LeetCodeSubmission = {
     sortable: {
       id: 1594,
@@ -56,8 +55,22 @@ export default function LeetCode(): ReactNode{
     url: "https://leetcode.com/problems/maximum-non-negative-product-in-a-matrix/submissions/1957102517"
   }
 
+  let exampleItem3: LeetCodeSubmission = {
+    sortable: {
+      id: 3546,
+      diff: 1,
+      lang: 2,
+      runtimeBeats: 84.25,
+      memoryBeats: 41.1
+    } as LeetCodeSortable,
+    runtime: 106,
+    memory: 46.72,
+    title: "Equal Sum Grid Partition I",
+    url: "https://leetcode.com/problems/equal-sum-grid-partition-i/submissions/1958355260"
+  }
+
   // Populates the table. Can be sorted by sortByKey()
-  const [items, setItems] = useState([exampleItem1, exampleItem2]);
+  const [items, setItems] = useState([exampleItem1, exampleItem2, exampleItem3]);
 
   useEffect(() => { // Initialize weighted scores and apply default sort
     items.forEach((item) => { // Initialize weighted scores
@@ -119,14 +132,17 @@ export default function LeetCode(): ReactNode{
       </p>
 
       <GradientScroll
-        width="0.5rem"
+        gradWidth="0.5rem"
         endColor="var(--bs-body-bg)"
       >
         <Table responsive>
           <thead>
             <tr>
               {tableHeaders.map((header) => ( // Populate table header columns
-                <th key={header.key}>
+                <th key={header.key}
+                  // Enforce min width for "Problem" column only
+                  style={header.key == "id" ? {minWidth: "160px"} : {}}
+                >
                   <div className="d-flex align-items-center">
                     {header.label}
                     <div className="d-flex flex-column ms-2">
